@@ -16,6 +16,7 @@ export class CompleteTransfer extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("sequence", Value.fromBigInt(BigInt.zero()));
     this.set("hash", Value.fromBytes(Bytes.empty()));
   }
 
@@ -47,13 +48,13 @@ export class CompleteTransfer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get sequence(): i32 {
+  get sequence(): BigInt {
     let value = this.get("sequence");
-    return value!.toI32();
+    return value!.toBigInt();
   }
 
-  set sequence(value: i32) {
-    this.set("sequence", Value.fromI32(value));
+  set sequence(value: BigInt) {
+    this.set("sequence", Value.fromBigInt(value));
   }
 
   get hash(): Bytes {

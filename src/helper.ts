@@ -1,4 +1,4 @@
-import {Bytes} from "@graphprotocol/graph-ts";
+import {BigInt, Bytes} from "@graphprotocol/graph-ts";
 import {CompleteTransfer} from "../generated/schema";
 
 export function processSequenceNumber(vaa: Bytes, hash: Bytes) : void {
@@ -13,7 +13,7 @@ export function processSequenceNumber(vaa: Bytes, hash: Bytes) : void {
 	const result = sequence.toU64();
 	const id = hash.toHexString();
 	const entity = new CompleteTransfer(id);
-	entity.sequence = result;
+	entity.sequence = BigInt.fromU64(result);
 	entity.hash = hash;
 	entity.save();
 }

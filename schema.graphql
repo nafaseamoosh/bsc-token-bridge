@@ -1,5 +1,5 @@
 type CompleteTransfer @entity {
   id: ID!
-  sequence: Int!
+  sequence: BigInt!
   hash: Bytes! # address
 }
