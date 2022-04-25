@@ -7,7 +7,6 @@ import {
   CompleteTransferCall,
   CompleteTransferAndUnwrapETHCall,
 } from "../generated/TokenBridge/TokenBridge"
-import { ExampleEntity } from "../generated/schema"
 import {processSequenceNumber} from "./helper";
 
 
