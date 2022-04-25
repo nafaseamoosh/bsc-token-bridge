@@ -11,31 +11,31 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class ExampleEntity extends Entity {
+export class CompleteTransfer extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("count", Value.fromBigInt(BigInt.zero()));
-    this.set("previousAdmin", Value.fromBytes(Bytes.empty()));
-    this.set("newAdmin", Value.fromBytes(Bytes.empty()));
+    this.set("hash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save ExampleEntity entity without an ID");
+    assert(id != null, "Cannot save CompleteTransfer entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save ExampleEntity entity with non-string ID. " +
+        "Cannot save CompleteTransfer entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("ExampleEntity", id.toString(), this);
+      store.set("CompleteTransfer", id.toString(), this);
     }
   }
 
-  static load(id: string): ExampleEntity | null {
-    return changetype<ExampleEntity | null>(store.get("ExampleEntity", id));
+  static load(id: string): CompleteTransfer | null {
+    return changetype<CompleteTransfer | null>(
+      store.get("CompleteTransfer", id)
+    );
   }
 
   get id(): string {
@@ -47,30 +47,21 @@ export class ExampleEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get count(): BigInt {
-    let value = this.get("count");
-    return value!.toBigInt();
+  get sequence(): i32 {
+    let value = this.get("sequence");
+    return value!.toI32();
   }
 
-  set count(value: BigInt) {
-    this.set("count", Value.fromBigInt(value));
+  set sequence(value: i32) {
+    this.set("sequence", Value.fromI32(value));
   }
 
-  get previousAdmin(): Bytes {
-    let value = this.get("previousAdmin");
+  get hash(): Bytes {
+    let value = this.get("hash");
     return value!.toBytes();
   }
 
-  set previousAdmin(value: Bytes) {
-    this.set("previousAdmin", Value.fromBytes(value));
-  }
-
-  get newAdmin(): Bytes {
-    let value = this.get("newAdmin");
-    return value!.toBytes();
-  }
-
-  set newAdmin(value: Bytes) {
-    this.set("newAdmin", Value.fromBytes(value));
+  set hash(value: Bytes) {
+    this.set("hash", Value.fromBytes(value));
   }
 }

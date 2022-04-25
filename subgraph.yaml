@@ -8,6 +8,7 @@ dataSources:
     source:
       address: "0xB6F6D86a8f9879A9c87f643768d9efc38c1Da6E7"
       abi: TokenBridge
+      startBlock: 17237856
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -19,11 +20,9 @@ dataSources:
       abis:
         - name: TokenBridge
           file: ./abis/TokenBridge.json
-      eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: BeaconUpgraded(indexed address)
-          handler: handleBeaconUpgraded
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
+      callHandlers:
+        - function: completeTransfer(bytes)
+          handler: handleCompleteTransfer
+        - function: completeTransferAndUnwrapETH(bytes)
+          handler: handleCompleteTransferAndUnwrapETH
       file: ./src/mapping.ts

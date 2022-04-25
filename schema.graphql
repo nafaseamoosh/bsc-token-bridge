@@ -1,6 +1,5 @@
-type ExampleEntity @entity {
+type CompleteTransfer @entity {
   id: ID!
-  count: BigInt!
-  previousAdmin: Bytes! # address
-  newAdmin: Bytes! # address
+  sequence: Int!
+  hash: Bytes! # address
 }

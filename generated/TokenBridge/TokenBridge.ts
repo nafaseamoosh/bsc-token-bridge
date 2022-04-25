@@ -50,6 +50,28 @@ export class BeaconUpgraded__Params {
   }
 }
 
+export class ContractUpgraded extends ethereum.Event {
+  get params(): ContractUpgraded__Params {
+    return new ContractUpgraded__Params(this);
+  }
+}
+
+export class ContractUpgraded__Params {
+  _event: ContractUpgraded;
+
+  constructor(event: ContractUpgraded) {
+    this._event = event;
+  }
+
+  get oldContract(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newContract(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class Upgraded extends ethereum.Event {
   get params(): Upgraded__Params {
     return new Upgraded__Params(this);
@@ -68,68 +90,988 @@ export class Upgraded__Params {
   }
 }
 
+export class TokenBridge__parseRegisterChainResultChainStruct extends ethereum.Tuple {
+  get module(): Bytes {
+    return this[0].toBytes();
+  }
+
+  get action(): i32 {
+    return this[1].toI32();
+  }
+
+  get chainId(): i32 {
+    return this[2].toI32();
+  }
+
+  get emitterChainID(): i32 {
+    return this[3].toI32();
+  }
+
+  get emitterAddress(): Bytes {
+    return this[4].toBytes();
+  }
+}
+
+export class TokenBridge__parseUpgradeResultChainStruct extends ethereum.Tuple {
+  get module(): Bytes {
+    return this[0].toBytes();
+  }
+
+  get action(): i32 {
+    return this[1].toI32();
+  }
+
+  get chainId(): i32 {
+    return this[2].toI32();
+  }
+
+  get newContract(): Bytes {
+    return this[3].toBytes();
+  }
+}
+
+export class TokenBridge__encodeAssetMetaInputMetaStruct extends ethereum.Tuple {
+  get payloadID(): i32 {
+    return this[0].toI32();
+  }
+
+  get tokenAddress(): Bytes {
+    return this[1].toBytes();
+  }
+
+  get tokenChain(): i32 {
+    return this[2].toI32();
+  }
+
+  get decimals(): i32 {
+    return this[3].toI32();
+  }
+
+  get symbol(): Bytes {
+    return this[4].toBytes();
+  }
+
+  get name(): Bytes {
+    return this[5].toBytes();
+  }
+}
+
+export class TokenBridge__encodeTransferInputTransferStruct extends ethereum.Tuple {
+  get payloadID(): i32 {
+    return this[0].toI32();
+  }
+
+  get amount(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get tokenAddress(): Bytes {
+    return this[2].toBytes();
+  }
+
+  get tokenChain(): i32 {
+    return this[3].toI32();
+  }
+
+  get to(): Bytes {
+    return this[4].toBytes();
+  }
+
+  get toChain(): i32 {
+    return this[5].toI32();
+  }
+
+  get fee(): BigInt {
+    return this[6].toBigInt();
+  }
+}
+
+export class TokenBridge__parseAssetMetaResultMetaStruct extends ethereum.Tuple {
+  get payloadID(): i32 {
+    return this[0].toI32();
+  }
+
+  get tokenAddress(): Bytes {
+    return this[1].toBytes();
+  }
+
+  get tokenChain(): i32 {
+    return this[2].toI32();
+  }
+
+  get decimals(): i32 {
+    return this[3].toI32();
+  }
+
+  get symbol(): Bytes {
+    return this[4].toBytes();
+  }
+
+  get name(): Bytes {
+    return this[5].toBytes();
+  }
+}
+
+export class TokenBridge__parseTransferResultTransferStruct extends ethereum.Tuple {
+  get payloadID(): i32 {
+    return this[0].toI32();
+  }
+
+  get amount(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get tokenAddress(): Bytes {
+    return this[2].toBytes();
+  }
+
+  get tokenChain(): i32 {
+    return this[3].toI32();
+  }
+
+  get to(): Bytes {
+    return this[4].toBytes();
+  }
+
+  get toChain(): i32 {
+    return this[5].toI32();
+  }
+
+  get fee(): BigInt {
+    return this[6].toBigInt();
+  }
+}
+
 export class TokenBridge extends ethereum.SmartContract {
   static bind(address: Address): TokenBridge {
     return new TokenBridge("TokenBridge", address);
   }
-}
 
-export class ConstructorCall extends ethereum.Call {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
+  WETH(): Address {
+    let result = super.call("WETH", "WETH():(address)", []);
+
+    return result[0].toAddress();
   }
 
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
+  try_WETH(): ethereum.CallResult<Address> {
+    let result = super.tryCall("WETH", "WETH():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  bridgeContracts(chainId_: i32): Bytes {
+    let result = super.call(
+      "bridgeContracts",
+      "bridgeContracts(uint16):(bytes32)",
+      [ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(chainId_))]
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_bridgeContracts(chainId_: i32): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "bridgeContracts",
+      "bridgeContracts(uint16):(bytes32)",
+      [ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(chainId_))]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  chainId(): i32 {
+    let result = super.call("chainId", "chainId():(uint16)", []);
+
+    return result[0].toI32();
+  }
+
+  try_chainId(): ethereum.CallResult<i32> {
+    let result = super.tryCall("chainId", "chainId():(uint16)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toI32());
+  }
+
+  governanceActionIsConsumed(hash: Bytes): boolean {
+    let result = super.call(
+      "governanceActionIsConsumed",
+      "governanceActionIsConsumed(bytes32):(bool)",
+      [ethereum.Value.fromFixedBytes(hash)]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_governanceActionIsConsumed(hash: Bytes): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "governanceActionIsConsumed",
+      "governanceActionIsConsumed(bytes32):(bool)",
+      [ethereum.Value.fromFixedBytes(hash)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  governanceChainId(): i32 {
+    let result = super.call(
+      "governanceChainId",
+      "governanceChainId():(uint16)",
+      []
+    );
+
+    return result[0].toI32();
+  }
+
+  try_governanceChainId(): ethereum.CallResult<i32> {
+    let result = super.tryCall(
+      "governanceChainId",
+      "governanceChainId():(uint16)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toI32());
+  }
+
+  governanceContract(): Bytes {
+    let result = super.call(
+      "governanceContract",
+      "governanceContract():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_governanceContract(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "governanceContract",
+      "governanceContract():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  isInitialized(impl: Address): boolean {
+    let result = super.call("isInitialized", "isInitialized(address):(bool)", [
+      ethereum.Value.fromAddress(impl)
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_isInitialized(impl: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "isInitialized",
+      "isInitialized(address):(bool)",
+      [ethereum.Value.fromAddress(impl)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  isTransferCompleted(hash: Bytes): boolean {
+    let result = super.call(
+      "isTransferCompleted",
+      "isTransferCompleted(bytes32):(bool)",
+      [ethereum.Value.fromFixedBytes(hash)]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_isTransferCompleted(hash: Bytes): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "isTransferCompleted",
+      "isTransferCompleted(bytes32):(bool)",
+      [ethereum.Value.fromFixedBytes(hash)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  isWrappedAsset(token: Address): boolean {
+    let result = super.call(
+      "isWrappedAsset",
+      "isWrappedAsset(address):(bool)",
+      [ethereum.Value.fromAddress(token)]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_isWrappedAsset(token: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "isWrappedAsset",
+      "isWrappedAsset(address):(bool)",
+      [ethereum.Value.fromAddress(token)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  outstandingBridged(token: Address): BigInt {
+    let result = super.call(
+      "outstandingBridged",
+      "outstandingBridged(address):(uint256)",
+      [ethereum.Value.fromAddress(token)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_outstandingBridged(token: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "outstandingBridged",
+      "outstandingBridged(address):(uint256)",
+      [ethereum.Value.fromAddress(token)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  parseRegisterChain(
+    encoded: Bytes
+  ): TokenBridge__parseRegisterChainResultChainStruct {
+    let result = super.call(
+      "parseRegisterChain",
+      "parseRegisterChain(bytes):((bytes32,uint8,uint16,uint16,bytes32))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+
+    return changetype<TokenBridge__parseRegisterChainResultChainStruct>(
+      result[0].toTuple()
+    );
+  }
+
+  try_parseRegisterChain(
+    encoded: Bytes
+  ): ethereum.CallResult<TokenBridge__parseRegisterChainResultChainStruct> {
+    let result = super.tryCall(
+      "parseRegisterChain",
+      "parseRegisterChain(bytes):((bytes32,uint8,uint16,uint16,bytes32))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      changetype<TokenBridge__parseRegisterChainResultChainStruct>(
+        value[0].toTuple()
+      )
+    );
+  }
+
+  parseUpgrade(encoded: Bytes): TokenBridge__parseUpgradeResultChainStruct {
+    let result = super.call(
+      "parseUpgrade",
+      "parseUpgrade(bytes):((bytes32,uint8,uint16,bytes32))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+
+    return changetype<TokenBridge__parseUpgradeResultChainStruct>(
+      result[0].toTuple()
+    );
+  }
+
+  try_parseUpgrade(
+    encoded: Bytes
+  ): ethereum.CallResult<TokenBridge__parseUpgradeResultChainStruct> {
+    let result = super.tryCall(
+      "parseUpgrade",
+      "parseUpgrade(bytes):((bytes32,uint8,uint16,bytes32))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      changetype<TokenBridge__parseUpgradeResultChainStruct>(value[0].toTuple())
+    );
+  }
+
+  tokenImplementation(): Address {
+    let result = super.call(
+      "tokenImplementation",
+      "tokenImplementation():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_tokenImplementation(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "tokenImplementation",
+      "tokenImplementation():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  wormhole(): Address {
+    let result = super.call("wormhole", "wormhole():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_wormhole(): ethereum.CallResult<Address> {
+    let result = super.tryCall("wormhole", "wormhole():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  wrappedAsset(tokenChainId: i32, tokenAddress: Bytes): Address {
+    let result = super.call(
+      "wrappedAsset",
+      "wrappedAsset(uint16,bytes32):(address)",
+      [
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(tokenChainId)),
+        ethereum.Value.fromFixedBytes(tokenAddress)
+      ]
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_wrappedAsset(
+    tokenChainId: i32,
+    tokenAddress: Bytes
+  ): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "wrappedAsset",
+      "wrappedAsset(uint16,bytes32):(address)",
+      [
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(tokenChainId)),
+        ethereum.Value.fromFixedBytes(tokenAddress)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  updateWrapped(encodedVm: Bytes): Address {
+    let result = super.call("updateWrapped", "updateWrapped(bytes):(address)", [
+      ethereum.Value.fromBytes(encodedVm)
+    ]);
+
+    return result[0].toAddress();
+  }
+
+  try_updateWrapped(encodedVm: Bytes): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "updateWrapped",
+      "updateWrapped(bytes):(address)",
+      [ethereum.Value.fromBytes(encodedVm)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  createWrapped(encodedVm: Bytes): Address {
+    let result = super.call("createWrapped", "createWrapped(bytes):(address)", [
+      ethereum.Value.fromBytes(encodedVm)
+    ]);
+
+    return result[0].toAddress();
+  }
+
+  try_createWrapped(encodedVm: Bytes): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "createWrapped",
+      "createWrapped(bytes):(address)",
+      [ethereum.Value.fromBytes(encodedVm)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  encodeAssetMeta(meta: TokenBridge__encodeAssetMetaInputMetaStruct): Bytes {
+    let result = super.call(
+      "encodeAssetMeta",
+      "encodeAssetMeta((uint8,bytes32,uint16,uint8,bytes32,bytes32)):(bytes)",
+      [ethereum.Value.fromTuple(meta)]
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_encodeAssetMeta(
+    meta: TokenBridge__encodeAssetMetaInputMetaStruct
+  ): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "encodeAssetMeta",
+      "encodeAssetMeta((uint8,bytes32,uint16,uint8,bytes32,bytes32)):(bytes)",
+      [ethereum.Value.fromTuple(meta)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  encodeTransfer(
+    transfer: TokenBridge__encodeTransferInputTransferStruct
+  ): Bytes {
+    let result = super.call(
+      "encodeTransfer",
+      "encodeTransfer((uint8,uint256,bytes32,uint16,bytes32,uint16,uint256)):(bytes)",
+      [ethereum.Value.fromTuple(transfer)]
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_encodeTransfer(
+    transfer: TokenBridge__encodeTransferInputTransferStruct
+  ): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "encodeTransfer",
+      "encodeTransfer((uint8,uint256,bytes32,uint16,bytes32,uint16,uint256)):(bytes)",
+      [ethereum.Value.fromTuple(transfer)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  parseAssetMeta(encoded: Bytes): TokenBridge__parseAssetMetaResultMetaStruct {
+    let result = super.call(
+      "parseAssetMeta",
+      "parseAssetMeta(bytes):((uint8,bytes32,uint16,uint8,bytes32,bytes32))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+
+    return changetype<TokenBridge__parseAssetMetaResultMetaStruct>(
+      result[0].toTuple()
+    );
+  }
+
+  try_parseAssetMeta(
+    encoded: Bytes
+  ): ethereum.CallResult<TokenBridge__parseAssetMetaResultMetaStruct> {
+    let result = super.tryCall(
+      "parseAssetMeta",
+      "parseAssetMeta(bytes):((uint8,bytes32,uint16,uint8,bytes32,bytes32))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      changetype<TokenBridge__parseAssetMetaResultMetaStruct>(
+        value[0].toTuple()
+      )
+    );
+  }
+
+  parseTransfer(
+    encoded: Bytes
+  ): TokenBridge__parseTransferResultTransferStruct {
+    let result = super.call(
+      "parseTransfer",
+      "parseTransfer(bytes):((uint8,uint256,bytes32,uint16,bytes32,uint16,uint256))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+
+    return changetype<TokenBridge__parseTransferResultTransferStruct>(
+      result[0].toTuple()
+    );
+  }
+
+  try_parseTransfer(
+    encoded: Bytes
+  ): ethereum.CallResult<TokenBridge__parseTransferResultTransferStruct> {
+    let result = super.tryCall(
+      "parseTransfer",
+      "parseTransfer(bytes):((uint8,uint256,bytes32,uint16,bytes32,uint16,uint256))",
+      [ethereum.Value.fromBytes(encoded)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      changetype<TokenBridge__parseTransferResultTransferStruct>(
+        value[0].toTuple()
+      )
+    );
   }
 }
 
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
+export class RegisterChainCall extends ethereum.Call {
+  get inputs(): RegisterChainCall__Inputs {
+    return new RegisterChainCall__Inputs(this);
+  }
 
-  constructor(call: ConstructorCall) {
+  get outputs(): RegisterChainCall__Outputs {
+    return new RegisterChainCall__Outputs(this);
+  }
+}
+
+export class RegisterChainCall__Inputs {
+  _call: RegisterChainCall;
+
+  constructor(call: RegisterChainCall) {
     this._call = call;
   }
 
-  get implementation(): Address {
+  get encodedVM(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class RegisterChainCall__Outputs {
+  _call: RegisterChainCall;
+
+  constructor(call: RegisterChainCall) {
+    this._call = call;
+  }
+}
+
+export class UpgradeCall extends ethereum.Call {
+  get inputs(): UpgradeCall__Inputs {
+    return new UpgradeCall__Inputs(this);
+  }
+
+  get outputs(): UpgradeCall__Outputs {
+    return new UpgradeCall__Outputs(this);
+  }
+}
+
+export class UpgradeCall__Inputs {
+  _call: UpgradeCall;
+
+  constructor(call: UpgradeCall) {
+    this._call = call;
+  }
+
+  get encodedVM(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class UpgradeCall__Outputs {
+  _call: UpgradeCall;
+
+  constructor(call: UpgradeCall) {
+    this._call = call;
+  }
+}
+
+export class AttestTokenCall extends ethereum.Call {
+  get inputs(): AttestTokenCall__Inputs {
+    return new AttestTokenCall__Inputs(this);
+  }
+
+  get outputs(): AttestTokenCall__Outputs {
+    return new AttestTokenCall__Outputs(this);
+  }
+}
+
+export class AttestTokenCall__Inputs {
+  _call: AttestTokenCall;
+
+  constructor(call: AttestTokenCall) {
+    this._call = call;
+  }
+
+  get tokenAddress(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get initData(): Bytes {
+  get nonce(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class AttestTokenCall__Outputs {
+  _call: AttestTokenCall;
+
+  constructor(call: AttestTokenCall) {
+    this._call = call;
+  }
+
+  get sequence(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class WrapAndTransferETHCall extends ethereum.Call {
+  get inputs(): WrapAndTransferETHCall__Inputs {
+    return new WrapAndTransferETHCall__Inputs(this);
+  }
+
+  get outputs(): WrapAndTransferETHCall__Outputs {
+    return new WrapAndTransferETHCall__Outputs(this);
+  }
+}
+
+export class WrapAndTransferETHCall__Inputs {
+  _call: WrapAndTransferETHCall;
+
+  constructor(call: WrapAndTransferETHCall) {
+    this._call = call;
+  }
+
+  get recipientChain(): i32 {
+    return this._call.inputValues[0].value.toI32();
+  }
+
+  get recipient(): Bytes {
     return this._call.inputValues[1].value.toBytes();
   }
+
+  get arbiterFee(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get nonce(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
 }
 
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
+export class WrapAndTransferETHCall__Outputs {
+  _call: WrapAndTransferETHCall;
 
-  constructor(call: ConstructorCall) {
+  constructor(call: WrapAndTransferETHCall) {
+    this._call = call;
+  }
+
+  get sequence(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class TransferTokensCall extends ethereum.Call {
+  get inputs(): TransferTokensCall__Inputs {
+    return new TransferTokensCall__Inputs(this);
+  }
+
+  get outputs(): TransferTokensCall__Outputs {
+    return new TransferTokensCall__Outputs(this);
+  }
+}
+
+export class TransferTokensCall__Inputs {
+  _call: TransferTokensCall;
+
+  constructor(call: TransferTokensCall) {
+    this._call = call;
+  }
+
+  get token(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get amount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get recipientChain(): i32 {
+    return this._call.inputValues[2].value.toI32();
+  }
+
+  get recipient(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
+
+  get arbiterFee(): BigInt {
+    return this._call.inputValues[4].value.toBigInt();
+  }
+
+  get nonce(): BigInt {
+    return this._call.inputValues[5].value.toBigInt();
+  }
+}
+
+export class TransferTokensCall__Outputs {
+  _call: TransferTokensCall;
+
+  constructor(call: TransferTokensCall) {
+    this._call = call;
+  }
+
+  get sequence(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateWrappedCall extends ethereum.Call {
+  get inputs(): UpdateWrappedCall__Inputs {
+    return new UpdateWrappedCall__Inputs(this);
+  }
+
+  get outputs(): UpdateWrappedCall__Outputs {
+    return new UpdateWrappedCall__Outputs(this);
+  }
+}
+
+export class UpdateWrappedCall__Inputs {
+  _call: UpdateWrappedCall;
+
+  constructor(call: UpdateWrappedCall) {
+    this._call = call;
+  }
+
+  get encodedVm(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class UpdateWrappedCall__Outputs {
+  _call: UpdateWrappedCall;
+
+  constructor(call: UpdateWrappedCall) {
+    this._call = call;
+  }
+
+  get token(): Address {
+    return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class CreateWrappedCall extends ethereum.Call {
+  get inputs(): CreateWrappedCall__Inputs {
+    return new CreateWrappedCall__Inputs(this);
+  }
+
+  get outputs(): CreateWrappedCall__Outputs {
+    return new CreateWrappedCall__Outputs(this);
+  }
+}
+
+export class CreateWrappedCall__Inputs {
+  _call: CreateWrappedCall;
+
+  constructor(call: CreateWrappedCall) {
+    this._call = call;
+  }
+
+  get encodedVm(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class CreateWrappedCall__Outputs {
+  _call: CreateWrappedCall;
+
+  constructor(call: CreateWrappedCall) {
+    this._call = call;
+  }
+
+  get token(): Address {
+    return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class CompleteTransferCall extends ethereum.Call {
+  get inputs(): CompleteTransferCall__Inputs {
+    return new CompleteTransferCall__Inputs(this);
+  }
+
+  get outputs(): CompleteTransferCall__Outputs {
+    return new CompleteTransferCall__Outputs(this);
+  }
+}
+
+export class CompleteTransferCall__Inputs {
+  _call: CompleteTransferCall;
+
+  constructor(call: CompleteTransferCall) {
+    this._call = call;
+  }
+
+  get encodedVm(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+}
+
+export class CompleteTransferCall__Outputs {
+  _call: CompleteTransferCall;
+
+  constructor(call: CompleteTransferCall) {
     this._call = call;
   }
 }
 
-export class DefaultCall extends ethereum.Call {
-  get inputs(): DefaultCall__Inputs {
-    return new DefaultCall__Inputs(this);
+export class CompleteTransferAndUnwrapETHCall extends ethereum.Call {
+  get inputs(): CompleteTransferAndUnwrapETHCall__Inputs {
+    return new CompleteTransferAndUnwrapETHCall__Inputs(this);
   }
 
-  get outputs(): DefaultCall__Outputs {
-    return new DefaultCall__Outputs(this);
+  get outputs(): CompleteTransferAndUnwrapETHCall__Outputs {
+    return new CompleteTransferAndUnwrapETHCall__Outputs(this);
   }
 }
 
-export class DefaultCall__Inputs {
-  _call: DefaultCall;
+export class CompleteTransferAndUnwrapETHCall__Inputs {
+  _call: CompleteTransferAndUnwrapETHCall;
 
-  constructor(call: DefaultCall) {
+  constructor(call: CompleteTransferAndUnwrapETHCall) {
     this._call = call;
   }
+
+  get encodedVm(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
 }
 
-export class DefaultCall__Outputs {
-  _call: DefaultCall;
+export class CompleteTransferAndUnwrapETHCall__Outputs {
+  _call: CompleteTransferAndUnwrapETHCall;
 
-  constructor(call: DefaultCall) {
+  constructor(call: CompleteTransferAndUnwrapETHCall) {
     this._call = call;
   }
 }
