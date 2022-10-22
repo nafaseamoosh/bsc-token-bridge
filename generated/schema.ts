@@ -57,6 +57,15 @@ export class CompleteTransfer extends Entity {
     this.set("sequence", Value.fromBigInt(value));
   }
 
+  get emitterChain(): i32 {
+    let value = this.get("emitterChain");
+    return value!.toI32();
+  }
+
+  set emitterChain(value: i32) {
+    this.set("emitterChain", Value.fromI32(value));
+  }
+
   get hash(): Bytes {
     let value = this.get("hash");
     return value!.toBytes();

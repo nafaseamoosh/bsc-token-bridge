@@ -1,4 +1,4 @@
-import {BigInt, Bytes} from "@graphprotocol/graph-ts"
+import {BigInt, Bytes, log} from "@graphprotocol/graph-ts"
 import {
   TokenBridge,
   AdminChanged,
@@ -12,6 +12,7 @@ import {processSequenceNumber} from "./helper";
 
 export function handleCompleteTransfer(call: CompleteTransferCall) : void {
   const vaa = call.inputs.encodedVm;
+  log.error('SET ERR', []);
   processSequenceNumber(vaa, call.transaction.hash);
 }
 
