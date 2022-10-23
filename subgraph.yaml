@@ -6,7 +6,7 @@ dataSources:
     name: TokenBridge
     network: bsc
     source:
-      address: "0x3ee18B2214AFF97000D974cf647E7C347E8fa585"
+      address: "0xB6F6D86a8f9879A9c87f643768d9efc38c1Da6E7"
       abi: TokenBridge
       startBlock: 22401674
     mapping:
